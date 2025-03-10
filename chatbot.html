@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot with Database Integration</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #chat-container { width: 300px; height: 400px; border: 1px solid #ccc; padding: 10px; overflow-y: auto; }
+        .message { padding: 5px; margin: 5px 0; }
+        .user { text-align: right; color: blue; }
+        .bot { text-align: left; color: green; }
+        #question-buttons { margin-top: 10px; }
+        button { margin: 5px; padding: 5px 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Chatbot</h2>
+    <div id="chat-container"></div>
+    <div id="question-buttons"></div>
+    
+    <script>
+        const questions = [
+            "Current disasters happening",
+            "Disaster grade",
+            "Help status"
+        ];
+
+        function loadQuestions() {
+            const buttonContainer = document.getElementById("question-buttons");
+            questions.forEach(question => {
+                const button = document.createElement("button");
+                button.innerText = question;
+                button.onclick = () => sendMessage(question);
+                buttonContainer.appendChild(button);
+            });
+        }
+
+        function sendMessage(question) {
+            const chatContainer = document.getElementById("chat-container");
+            chatContainer.innerHTML += `<div class='message user'>You: ${question}</div>`;
+            
+            fetch(`/get-response?question=${encodeURIComponent(question)}`)
+                .then(response => response.json())
+                .then(data => {
+                    chatContainer.innerHTML += `<div class='message bot'>Bot: ${data.response}</div>`;
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                })
+                .catch(error => {
+                    chatContainer.innerHTML += `<div class='message bot'>Bot: Error fetching response.</div>`;
+                });
+        }
+
+        loadQuestions();
+    </script>
+</body>
+</html>
